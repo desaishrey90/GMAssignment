@@ -1,5 +1,6 @@
 package com.example.gmassignment;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     Button btnSearch, btnRepoSearch;
     EditText etUserSearchText, etRepoSearchText;
     LinearLayout llRepoSearch;
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         etUserSearchText = (EditText)findViewById(R.id.etUserSearchText);
         etRepoSearchText = (EditText)findViewById(R.id.etRepoSearchText);
 
+        dialog = new ProgressDialog(MainActivity.this);
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                llRepoSearch.setVisibility(View.VISIBLE);
+                dialog.setMessage("Searching for repositories..");
+                dialog.show();
                 getRepos(etUserSearchText.getText().toString());
             }
         });
@@ -65,16 +69,17 @@ public class MainActivity extends AppCompatActivity {
             githubHelper.getUserRepos(name, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-
+                    dialog.dismiss();
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-
+                    dialog.dismiss();
                     if (response.code() == 200) {
-
+                        llRepoSearch.setVisibility(View.VISIBLE);
                     }
-                    else if (response.code() == 404) {
+                    else {
+                        Log.v("GetRepoErrorCode", String.valueOf(response.code()));
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -83,13 +88,13 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
                     }
-                    else {
-                        Log.v("GetRepoErrorCode", String.valueOf(response.code()));
-                    }
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
         }
     }
 }
