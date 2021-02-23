@@ -70,6 +70,14 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     dialog.dismiss();
+                    e.printStackTrace();
+                    MainActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this,"There was an error while searching for repositories. Please try again", Toast.LENGTH_LONG ).show();
+                            return;
+                        }
+                    });
                 }
 
                 @Override
