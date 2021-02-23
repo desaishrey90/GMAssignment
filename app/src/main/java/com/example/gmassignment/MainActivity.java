@@ -1,28 +1,39 @@
 package com.example.gmassignment;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnSearch;
-    EditText etUserSearchText;
+    Button btnSearch, btnRepoSearch;
+    EditText etUserSearchText, etRepoSearchText;
+    LinearLayout llRepoSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        llRepoSearch = (LinearLayout)findViewById(R.id.llRepoSearch);
         btnSearch = (Button)findViewById(R.id.btnSearch);
+        btnRepoSearch = (Button)findViewById(R.id.btnRepoSearch);
         etUserSearchText = (EditText)findViewById(R.id.etUserSearchText);
+        etRepoSearchText = (EditText)findViewById(R.id.etRepoSearchText);
 
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,7 +51,45 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this,"Please enter a user name.", Toast.LENGTH_LONG ).show();
                     return;
                 }
+
+                llRepoSearch.setVisibility(View.VISIBLE);
+                getRepos(etUserSearchText.getText().toString());
             }
         });
+    }
+
+    public void getRepos(String name) {
+        try {
+            final GitHubHelper githubHelper = new GitHubHelper();
+
+            githubHelper.getUserRepos(name, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+
+                    if (response.code() == 200) {
+
+                    }
+                    else if (response.code() == 404) {
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this,"Please enter a valid user name.", Toast.LENGTH_LONG ).show();
+                                return;
+                            }
+                        });
+                    }
+                    else {
+                        Log.v("GetRepoErrorCode", String.valueOf(response.code()));
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

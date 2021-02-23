@@ -23,4 +23,24 @@
             android:id="@+id/btnSearch"
             android:layout_gravity="center_horizontal"/>
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/llRepoSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:visibility="gone">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/etRepoSearchText"
+            android:hint="Search for Repository"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Search"
+            android:id="@+id/btnRepoSearch"
+            android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
 </LinearLayout>
