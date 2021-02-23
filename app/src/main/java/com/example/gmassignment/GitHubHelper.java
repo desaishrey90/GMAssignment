@@ -50,4 +50,21 @@ public class GitHubHelper {
         }
         return repoNames;
     }
+
+    public void getCommits(String commitUrl, Callback callback){
+        try {
+            OkHttpClient client = new OkHttpClient.Builder().build();
+            HttpUrl.Builder urlBuilder = HttpUrl.parse(commitUrl).newBuilder();
+            urlBuilder.addQueryParameter("access_token",Constants.GITHUB_TOKEN);
+            String url = urlBuilder.build().toString();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            Call call = client.newCall(request);
+            call.enqueue(callback);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }
