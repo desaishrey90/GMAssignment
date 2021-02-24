@@ -1,4 +1,6 @@
 package com.example.gmassignment;
+import com.example.gmassignment.Model.Commit;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,5 +68,32 @@ public class GitHubHelper {
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<Commit> processCommitResult(Response response) {
+        ArrayList<Commit> commits = new ArrayList<>();
+        try {
+            String jsonData = response.body().string();
+            JSONArray reposJsonArray = new JSONArray(jsonData);
+
+            for (int i=0; i<reposJsonArray.length(); i++)
+            {
+                JSONObject commit = ((JSONObject)((JSONObject)reposJsonArray.get(i)).get("commit"));
+                String commitMessage = commit.getString("message");
+                String authorName = ((JSONObject)commit.get("author")).getString("name");
+                String authorEmail = ((JSONObject)commit.get("author")).getString("email");
+                String commitHash = ((JSONObject)commit.get("tree")).getString("sha");
+
+                Commit newCommit = new Commit(authorName, authorEmail, commitMessage, commitHash);
+                commits.add(newCommit);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return  commits;
     }
 }
