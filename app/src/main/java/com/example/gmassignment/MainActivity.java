@@ -2,10 +2,12 @@ package com.example.gmassignment;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog dialog;
     ListView lvRepo;
     ArrayAdapter<String> repoAdapter;
+    ArrayList<String> repoNames;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,17 @@ public class MainActivity extends AppCompatActivity {
         btnSearch = (Button)findViewById(R.id.btnSearch);
         etUserSearchText = (EditText)findViewById(R.id.etUserSearchText);
         lvRepo = (ListView)findViewById(R.id.lvRepo);
+
+        lvRepo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                                    long id) {
+                Intent i = new Intent(MainActivity.this, GitCommitsActivity.class);
+                i.putExtra("userName", etUserSearchText.getText().toString());
+                i.putExtra("repoName", repoNames.get(position));
+                startActivity(i);
+            }
+        });
 
         dialog = new ProgressDialog(MainActivity.this);
         btnSearch.setOnClickListener(new View.OnClickListener() {
@@ -92,12 +106,9 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 llRepoSearch.setVisibility(View.VISIBLE);
-                                ArrayList<String> repoNames = githubHelper.processUserRepos(response);
+                                repoNames = githubHelper.processUserRepos(response);
                                 repoAdapter =
                                         new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, repoNames);
-//                                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-//                                recyclerView.setLayoutManager(layoutManager);
-//                                recyclerView.setHasFixedSize(true);
                                 lvRepo.setAdapter(repoAdapter);
                             }
                         });
